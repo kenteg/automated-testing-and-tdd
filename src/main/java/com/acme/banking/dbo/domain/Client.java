@@ -9,16 +9,20 @@ import java.util.UUID;
 public class Client {
     private UUID id;
     private String name;
+
+    public Collection<UUID> getAccountIds() {
+        return accountIds;
+    }
+
     private Collection<UUID> accountIds = new ArrayList<>(); //TODO
 
     public Client(UUID id, String name) {
         Guard.checkNonNull(id, () -> {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Id of client is null");
         });
         Guard.checkNonNull(name, () -> {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Name of client is null");
         });
-
         this.id = id;
         this.name = name;
     }
@@ -29,5 +33,13 @@ public class Client {
 
     public String getName() {
         return name;
+    }
+
+    public void addAccount(Account account){
+        if (account.getClientId().equals(id)) {
+            accountIds.add(account.getId());
+        } else {
+            throw new IllegalStateException("Account is related to other client");
+        }
     }
 }

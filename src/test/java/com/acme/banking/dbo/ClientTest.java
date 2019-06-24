@@ -1,9 +1,12 @@
 package com.acme.banking.dbo;
 
+import com.acme.banking.dbo.domain.Account;
 import com.acme.banking.dbo.domain.Client;
 import com.acme.banking.dbo.domain.SavingAccount;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.util.UUID;
 
@@ -14,6 +17,9 @@ import static org.junit.Assert.*;
 import static org.junit.Assert.assertThat;
 
 public class ClientTest {
+
+    @Rule
+    public final ExpectedException exception = ExpectedException.none();
     @Test
     public void shouldSavePropertiesWhenCreated() {
         //region given
@@ -45,10 +51,20 @@ public class ClientTest {
 
     @Test
     public void shouldGettersReturnValues() {
-        final UUID clientId = UUID.fromString("1");
+        final UUID clientId = UUID.randomUUID();
         final String clientName = "kek";
         Client client = new Client(clientId, clientName);
         assertEquals(clientId, client.getId());
         assertEquals(clientName, client.getName());
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void shouldThrowsExceptionWhenAddAccountRelatedToOtherClient(){
+        Client otherClient = new Client(UUID.randomUUID(), "otherClient");
+        Account otherClientAccount = new SavingAccount(UUID.randomUUID(),otherClient, 100.0);
+
+        Client testClient = new Client(UUID.randomUUID(), "testClient");
+
+        testClient.addAccount(otherClientAccount);
     }
 }

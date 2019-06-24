@@ -10,8 +10,15 @@ public class SavingAccount implements Account {
     private double amount;
 
     public SavingAccount(UUID id, Client client, double amount) {
-        Guard.checkNonNull(id, () -> {throw new IllegalArgumentException();});
-        Guard.checkNonNull(client, () -> {throw new IllegalArgumentException();});
+        Guard.checkNonNull(id, () -> {
+            throw new IllegalArgumentException("Id of account is null");
+        });
+        Guard.checkNonNull(client, () -> {
+            throw new IllegalArgumentException("Client of account is null");
+        });
+        if (amount < 0) {
+            throw new IllegalArgumentException("Amount of account is sub zero");
+        }
         this.id = id;
         this.client = client;
         this.amount = amount;
