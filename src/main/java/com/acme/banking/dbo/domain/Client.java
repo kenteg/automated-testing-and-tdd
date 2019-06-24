@@ -1,5 +1,7 @@
 package com.acme.banking.dbo.domain;
 
+import com.acme.banking.dbo.service.Guard;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.UUID;
@@ -10,6 +12,13 @@ public class Client {
     private Collection<UUID> accountIds = new ArrayList<>(); //TODO
 
     public Client(UUID id, String name) {
+        Guard.checkNonNull(id, () -> {
+            throw new IllegalArgumentException();
+        });
+        Guard.checkNonNull(name, () -> {
+            throw new IllegalArgumentException();
+        });
+
         this.id = id;
         this.name = name;
     }
