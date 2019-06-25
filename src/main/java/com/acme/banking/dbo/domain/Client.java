@@ -23,6 +23,9 @@ public class Client {
         Guard.checkNonNull(name, () -> {
             throw new IllegalArgumentException("Name of client is null");
         });
+        if (name.equals("")) {
+            throw new IllegalArgumentException("Name of client is empty");
+        }
         this.id = id;
         this.name = name;
     }
@@ -35,7 +38,7 @@ public class Client {
         return name;
     }
 
-    public void addAccount(Account account){
+    public void addAccount(Account account) {
         if (account.getClientId().equals(id)) {
             accountIds.add(account.getId());
         } else {
