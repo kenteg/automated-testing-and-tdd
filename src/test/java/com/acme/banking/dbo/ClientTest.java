@@ -3,23 +3,24 @@ package com.acme.banking.dbo;
 import com.acme.banking.dbo.domain.Account;
 import com.acme.banking.dbo.domain.Client;
 import com.acme.banking.dbo.domain.SavingAccount;
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.util.UUID;
 
-import static org.hamcrest.CoreMatchers.allOf;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertThat;
 
 public class ClientTest {
 
+    private static final String TEST_CLIENT_NAME = "John";
+    public static final double AMOUNT = 100.0;
+
     @Rule
     public final ExpectedException exception = ExpectedException.none();
+
     @Test
     public void shouldSavePropertiesWhenCreated() {
         //region given
@@ -32,39 +33,50 @@ public class ClientTest {
 
         //region then
         assertThat(sut.getId(),
-            allOf(
-                equalTo(stubId),
-                notNullValue()
-        ));
+                allOf(
+                        equalTo(stubId),
+                        notNullValue()
+                ));
         //endregion
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void shouldThrowExceptionWhenNullUUID() {
-        new Client(null, "kek");
+        exception.expect(IllegalArgumentException.class);
+        exception.expectMessage("Id of client is null");
+        new Client(null, TEST_CLIENT_NAME);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void shouldThrowExceptionWhenNullName() {
+        exception.expect(IllegalArgumentException.class);
+        exception.expectMessage("Name of client is null");
         new Client(UUID.randomUUID(), null);
     }
 
     @Test
-    public void shouldGettersReturnValues() {
+    public void shouldThrowExceptionWhenNameIsEmpty() {
+        exception.expect(IllegalArgumentException.class);
+        exception.expectMessage("Name of client is empty");
+        new Client(UUID.randomUUID(), "");
+    }
+
+    @Test
+    public void shouldGettersReturnValuesAfterClientCreated() {
         final UUID clientId = UUID.randomUUID();
-        final String clientName = "kek";
-        Client client = new Client(clientId, clientName);
-        assertEquals(clientId, client.getId());
-        assertEquals(clientName, client.getName());
+        Client client = new Client(clientId, TEST_CLIENT_NAME);
+        assertThat(client.getId(), equalTo(clientId));
+        assertThat(client.getName(),
+                equalTo(TEST_CLIENT_NAME)
+        );
+
     }
 
     @Test(expected = IllegalStateException.class)
-    public void shouldThrowsExceptionWhenAddAccountRelatedToOtherClient(){
+    public void shouldThrowsExceptionWhenAddAccountRelatedToOtherClient() {
         Client otherClient = new Client(UUID.randomUUID(), "otherClient");
-        Account otherClientAccount = new SavingAccount(UUID.randomUUID(),otherClient, 100.0);
-
-        Client testClient = new Client(UUID.randomUUID(), "testClient");
-
+        Account otherClientAccount = new SavingAccount(UUID.randomUUID(), otherClient, AMOUNT);
+        Client testClient = new Client(UUID.randomUUID(), TEST_CLIENT_NAME);
         testClient.addAccount(otherClientAccount);
     }
 }
